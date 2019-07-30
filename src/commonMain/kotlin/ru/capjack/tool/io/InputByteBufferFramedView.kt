@@ -25,41 +25,42 @@ class InputByteBufferFramedView(
 	}
 	
 	override fun readByte(): Byte {
-		checkSize(1)
+		checkRead(1)
 		return buffer.readByte().also {
-			decreaseSize(1)
+			commitRead(1)
 		}
 	}
 	
 	override fun readInt(): Int {
-		checkSize(4)
+		checkRead(4)
 		return buffer.readInt().also {
-			decreaseSize(4)
+			commitRead(4)
 		}
 	}
 	
 	override fun readLong(): Long {
-		checkSize(8)
+		checkRead(8)
 		return buffer.readLong().also {
-			decreaseSize(8)
+			commitRead(8)
 		}
 	}
 	
 	override fun readArray(target: ByteArray, offset: Int, size: Int) {
-		checkSize(size)
-		buffer.readByte()
-		decreaseSize(size)
+		checkRead(size)
+		buffer.readArray(target, offset, size)
+		commitRead(size)
 	}
 	
 	override fun readBuffer(target: OutputByteBuffer, size: Int) {
-		checkSize(size)
+		checkRead(size)
 		buffer.readBuffer(target, size)
-		decreaseSize(size)
+		commitRead(size)
 	}
 	
-	override fun rollbackRead(size: Int) {
-		buffer.rollbackRead(size)
-		this.size += size
+	override fun readSkip(size: Int) {
+		checkRead(size)
+		buffer.readSkip(size)
+		commitRead(size)
 	}
 	
 	private fun fillSize(): Boolean {
@@ -76,13 +77,16 @@ class InputByteBufferFramedView(
 		}
 	}
 	
-	private fun checkSize(size: Int) {
+	private fun checkRead(size: Int) {
+		if (size < 0) {
+			throw IllegalArgumentException("Reading size is negative")
+		}
 		if (size > readableSize) {
 			throw BufferReadingException(size, readableSize)
 		}
 	}
 	
-	private fun decreaseSize(v: Int) {
+	private fun commitRead(v: Int) {
 		size -= v
 		if (size == 0) {
 			state = State.SIZE

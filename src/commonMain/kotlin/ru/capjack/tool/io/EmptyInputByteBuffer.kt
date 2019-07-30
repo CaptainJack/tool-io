@@ -1,12 +1,6 @@
 package ru.capjack.tool.io
 
 object EmptyInputByteBuffer : InputByteBuffer {
-	override fun rollbackRead(size: Int) {
-		if (size > 0) {
-			throw BufferReadingException(size, 0)
-		}
-	}
-	
 	override val readable: Boolean = false
 	
 	override val readableSize: Int = 0
@@ -34,6 +28,12 @@ object EmptyInputByteBuffer : InputByteBuffer {
 	}
 	
 	override fun readBuffer(target: OutputByteBuffer, size: Int) {
+		if (size != 0) {
+			throw BufferReadingException(size, 0)
+		}
+	}
+	
+	override fun readSkip(size: Int) {
 		if (size != 0) {
 			throw BufferReadingException(size, 0)
 		}

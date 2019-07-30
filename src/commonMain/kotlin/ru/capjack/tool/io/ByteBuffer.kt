@@ -23,54 +23,52 @@ open class ByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, OutputByteBu
 	}
 	
 	override fun readByte(): Byte {
-		checkReadable(1)
+		checkRead(1)
 		val value = array[readerCursor]
-		commitReadable(1)
+		commitRead(1)
 		return value
 	}
 	
 	override fun readInt(): Int {
-		checkReadable(4)
+		checkRead(4)
 		val value = array.getInt(readerCursor)
-		commitReadable(4)
+		commitRead(4)
 		return value
 	}
 	
 	override fun readLong(): Long {
-		checkReadable(8)
+		checkRead(8)
 		val value = array.getLong(readerCursor)
-		commitReadable(8)
+		commitRead(8)
 		return value
 	}
 	
 	override fun readArray(target: ByteArray, offset: Int, size: Int) {
 		if (size != 0) {
-			if (size < 0) {
-				throw IllegalArgumentException()
-			}
-			checkReadable(size)
+			checkRead(size)
 			try {
 				array.copyInto(target, offset, readerCursor, readerCursor + size)
 			}
 			catch (e: Exception) {
 				println(e)
 			}
-			commitReadable(size)
+			commitRead(size)
 		}
 	}
 	
 	override fun readBuffer(target: OutputByteBuffer, size: Int) {
-		if (size > 0) {
+		if (size != 0) {
+			checkRead(size)
 			target.writeArray(array, readerCursor, size)
-			commitReadable(size)
+			commitRead(size)
 		}
 	}
 	
-	override fun rollbackRead(size: Int) {
-		if (readerCursor < size) {
-			throw BufferReadingException(size, readerCursor)
+	override fun readSkip(size: Int) {
+		if (size != 0) {
+			checkRead(size)
+			commitRead(size)
 		}
-		readerCursor -= size
 	}
 	
 	override fun writeByte(value: Byte) {
@@ -91,9 +89,6 @@ open class ByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, OutputByteBu
 	}
 	
 	override fun writeArray(value: ByteArray, offset: Int, size: Int) {
-		if (size < 0) {
-			throw IllegalArgumentException()
-		}
 		if (size != 0) {
 			ensureWrite(size)
 			value.copyInto(array, writerCursor, offset, offset + size)
@@ -103,25 +98,42 @@ open class ByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, OutputByteBu
 	
 	override fun writeBuffer(value: InputByteBuffer) {
 		val size = value.readableSize
-		if (size > 0) {
+		if (size != 0) {
 			ensureWrite(size)
 			value.readArray(array, writerCursor, size)
 			writerCursor += size
 		}
 	}
 	
-	private fun checkReadable(size: Int) {
-		if (readableSize < size) {
+	fun rollbackRead() {
+		readerCursor = 0
+	}
+	
+	fun rollbackRead(size: Int) {
+		if (readerCursor < size) {
+			throw BufferReadingException(size, readerCursor)
+		}
+		readerCursor -= size
+	}
+	
+	private fun checkRead(size: Int) {
+		if (size < 0) {
+			throw IllegalArgumentException("Reading size is negative")
+		}
+		if (size > readableSize) {
 			throw BufferReadingException(size, readableSize)
 		}
 	}
 	
-	private fun commitReadable(size: Int) {
+	private fun commitRead(size: Int) {
 		readerCursor += size
 	}
 	
 	private fun ensureWrite(size: Int) {
-		if (readerCursor == writerCursor) {
+		if (size < 0) {
+			throw IllegalArgumentException("Writing size is negative")
+		}
+		if (readerCursor == writerCursor && readerCursor != 0) {
 			clear()
 		}
 		ensureArrayCapacity(writerCursor + size)
@@ -131,7 +143,7 @@ open class ByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, OutputByteBu
 		val old = array.size
 		if (min > old) {
 			var new = old + old.shl(1)
-			if (new < 0) {
+			if (new < min) {
 				new = min
 			}
 			array = array.copyOf(new)
@@ -144,6 +156,18 @@ open class ByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, OutputByteBu
 	companion object {
 		inline operator fun invoke(block: ByteBuffer.() -> Unit): ByteBuffer {
 			return ByteBuffer().apply(block)
+		}
+		
+		inline operator fun invoke(initialCapacity: Int, block: ByteBuffer.() -> Unit): ByteBuffer {
+			return ByteBuffer(initialCapacity).apply(block)
+		}
+		
+		operator fun invoke(from: InputByteBuffer): ByteBuffer {
+			return ByteBuffer(from.readableSize) { writeBuffer(from) }
+		}
+		
+		operator fun invoke(bytes: ByteArray): ByteBuffer {
+			return ByteBuffer(bytes.size) { writeArray(bytes) }
 		}
 	}
 }

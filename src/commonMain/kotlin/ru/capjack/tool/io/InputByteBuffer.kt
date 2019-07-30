@@ -17,5 +17,5 @@ interface InputByteBuffer {
 	
 	fun readBuffer(target: OutputByteBuffer, size: Int = readableSize)
 	
-	fun rollbackRead(size: Int)
+	fun readSkip(size: Int = readableSize)
 }
