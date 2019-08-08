@@ -1,6 +1,8 @@
 package ru.capjack.tool.io
 
 interface OutputByteBuffer {
+	val writeableArrayView: ArrayView
+	
 	fun writeByte(value: Byte)
 	
 	fun writeInt(value: Int)
@@ -10,4 +12,13 @@ interface OutputByteBuffer {
 	fun writeArray(value: ByteArray, offset: Int = 0, size: Int = value.size - offset)
 	
 	fun writeBuffer(value: InputByteBuffer)
+	
+	fun ensureWrite(size: Int)
+	
+	fun skipWrite(size: Int)
+	
+	interface ArrayView {
+		val array: ByteArray
+		val writerIndex: Int
+	}
 }
