@@ -47,6 +47,12 @@ object EmptyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
 	
 	override fun backRead(size: Int) {
 		if (size != 0) {
+			throw BufferUnderflowException(size, 0, true)
+		}
+	}
+	
+	override fun commitRead(size: Int) {
+		if (size != 0) {
 			throw BufferUnderflowException(size, 0)
 		}
 	}

@@ -20,5 +20,7 @@ interface OutputByteBuffer {
 	interface ArrayView {
 		val array: ByteArray
 		val writerIndex: Int
+		
+		fun commitWrite(size: Int)
 	}
 }

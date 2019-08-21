@@ -26,5 +26,7 @@ interface InputByteBuffer {
 	interface ArrayView {
 		val array: ByteArray
 		val readerIndex: Int
+		
+		fun commitRead(size: Int)
 	}
 }

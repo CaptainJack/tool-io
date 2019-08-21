@@ -1,5 +1,6 @@
 package ru.capjack.tool.io
 
+import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 import ru.capjack.tool.lang.then
 
 open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer, OutputByteBuffer.ArrayView {
@@ -22,7 +23,7 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 	}
 	
 	
-	private var _array = ByteArray(initialCapacity)
+	private var _array = if (initialCapacity == 0) EMPTY_BYTE_ARRAY else ByteArray(initialCapacity)
 	private var _readerIndex = 0
 	private var _writerIndex = 0
 	
@@ -66,21 +67,21 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 	override fun readByte(): Byte {
 		checkRead(1)
 		return _array[_readerIndex].then {
-			commitRead(1)
+			completeRead(1)
 		}
 	}
 	
 	override fun readInt(): Int {
 		checkRead(4)
 		return _array.getInt(_readerIndex).then {
-			commitRead(4)
+			completeRead(4)
 		}
 	}
 	
 	override fun readLong(): Long {
 		checkRead(8)
 		return _array.getLong(_readerIndex).then {
-			commitRead(8)
+			completeRead(8)
 		}
 	}
 	
@@ -88,7 +89,7 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 		if (size != 0) {
 			checkRead(size)
 			_array.copyInto(target, offset, _readerIndex, _readerIndex + size)
-			commitRead(size)
+			completeRead(size)
 		}
 	}
 	
@@ -96,14 +97,14 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 		if (size != 0) {
 			checkRead(size)
 			target.writeArray(_array, _readerIndex, size)
-			commitRead(size)
+			completeRead(size)
 		}
 	}
 	
 	override fun skipRead(size: Int) {
 		if (size != 0) {
 			checkRead(size)
-			commitRead(size)
+			completeRead(size)
 		}
 	}
 	
@@ -120,26 +121,26 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 	override fun writeByte(value: Byte) {
 		ensureWrite(1)
 		_array[_writerIndex] = value
-		commitWrite(1)
+		completeWrite(1)
 	}
 	
 	override fun writeInt(value: Int) {
 		ensureWrite(4)
 		_array.putInt(_writerIndex, value)
-		commitWrite(4)
+		completeWrite(4)
 	}
 	
 	override fun writeLong(value: Long) {
 		ensureWrite(8)
 		_array.putLong(_writerIndex, value)
-		commitWrite(8)
+		completeWrite(8)
 	}
 	
 	override fun writeArray(value: ByteArray, offset: Int, size: Int) {
 		if (size != 0) {
 			ensureWrite(size)
 			value.copyInto(_array, _writerIndex, offset, offset + size)
-			commitWrite(size)
+			completeWrite(size)
 		}
 	}
 	
@@ -148,7 +149,7 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 		if (size != 0) {
 			ensureWrite(size)
 			value.readArray(_array, _writerIndex, size)
-			commitWrite(size)
+			completeWrite(size)
 		}
 	}
 	
@@ -177,8 +178,16 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 	override fun skipWrite(size: Int) {
 		if (size != 0) {
 			ensureWrite(size)
-			commitWrite(size)
+			completeWrite(size)
 		}
+	}
+	
+	override fun commitRead(size: Int) {
+		skipRead(size)
+	}
+	
+	override fun commitWrite(size: Int) {
+		skipWrite(size)
 	}
 	
 	private fun checkRead(size: Int) {
@@ -190,11 +199,11 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 		}
 	}
 	
-	private fun commitRead(size: Int) {
+	private fun completeRead(size: Int) {
 		_readerIndex += size
 	}
 	
-	private fun commitWrite(size: Int) {
+	private fun completeWrite(size: Int) {
 		_writerIndex += size
 	}
 }
