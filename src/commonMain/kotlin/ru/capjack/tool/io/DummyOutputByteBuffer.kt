@@ -2,7 +2,7 @@ package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 
-class DummyOutputByteBuffer : OutputByteBuffer, OutputByteBuffer.ArrayView {
+object DummyOutputByteBuffer : OutputByteBuffer, OutputByteBuffer.ArrayView {
 	override val writerIndex: Int
 		get() = 0
 	
