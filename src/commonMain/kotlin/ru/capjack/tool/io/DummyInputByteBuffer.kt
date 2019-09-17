@@ -2,11 +2,18 @@ package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 
-object EmptyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
-	override val readable: Boolean = false
-	override val readableSize: Int = 0
-	override val readableArrayView: InputByteBuffer.ArrayView = this
-	override val readerIndex: Int = 0
+object DummyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
+	override val readable: Boolean
+		get() = false
+	
+	override val readableSize: Int
+		get() = 0
+	
+	override val readerIndex: Int
+		get() = 0
+	
+	override val readableArrayView: InputByteBuffer.ArrayView
+		get() = this
 	
 	override val array: ByteArray
 		get() = EMPTY_BYTE_ARRAY
