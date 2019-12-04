@@ -18,6 +18,9 @@ fun ByteArray.putLong(offset: Int, value: Long) {
 	this[offset + 7] = value.toByte()
 }
 
+fun ByteArray.putByteArray(offset: Int, value: ByteArray) {
+	value.copyInto(this, offset)
+}
 
 fun ByteArray.getInt(offset: Int): Int {
 	return this[offset].toInt().and(0xFF).shl(24) +
@@ -35,4 +38,8 @@ fun ByteArray.getLong(offset: Int): Long {
 		this[offset + 5].toInt().and(0xFF).shl(16) +
 		this[offset + 6].toInt().and(0xFF).shl(8) +
 		this[offset + 7].toInt().and(0xFF)
+}
+
+fun ByteArray.getByteArray(offset: Int, size: Int): ByteArray {
+	return copyOfRange(offset, offset + size)
 }
