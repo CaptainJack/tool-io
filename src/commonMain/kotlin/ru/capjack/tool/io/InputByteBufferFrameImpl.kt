@@ -4,28 +4,40 @@ import ru.capjack.tool.lang.alsoIf
 import ru.capjack.tool.lang.lefIf
 import ru.capjack.tool.lang.then
 
-class InputByteBufferFrameView(
+class InputByteBufferFrameImpl(
 	private val buffer: InputByteBuffer
-) : InputByteBuffer {
+) : InputByteBufferFrame {
 	
-	private enum class State { WAIT_SIZE, WAIT_BODY, READ }
+	private enum class State { SIZE, BODY, READ }
 	
-	private var state = State.WAIT_SIZE
+	private var state = State.SIZE
 	private var frameSize = 0
 	private var frameReaderIndex = 0
 	
 	override val readable: Boolean
-		get() = when (state) {
-			State.WAIT_SIZE -> takeSize()
-			State.WAIT_BODY -> takeBody()
-			State.READ      -> true
-		}
+		get() = readableSize > 0
 	
 	override val readableSize: Int
-		get() = if (readable) frameSize - frameReaderIndex else 0
+		get() = if (state == State.READ) frameSize - frameReaderIndex else 0
 	
 	override val readableArrayView: InputByteBuffer.ArrayView
 		get() = buffer.readableArrayView
+	
+	override fun fill(): Boolean {
+		return when (state) {
+			State.SIZE -> takeSize()
+			State.BODY -> takeBody()
+			State.READ -> {
+				if (readable) true
+				else {
+					state = State.SIZE
+					frameSize = 0
+					frameReaderIndex = 0
+					fill()
+				}
+			}
+		}
+	}
 	
 	override fun isReadable(size: Int): Boolean {
 		return readableSize >= size
@@ -83,18 +95,12 @@ class InputByteBufferFrameView(
 	private fun takeSize(): Boolean {
 		return buffer.isReadable(4).lefIf {
 			val v = buffer.readInt()
-			when {
-				v > 0  -> {
-					frameSize = v
-					state = State.WAIT_BODY
-					takeBody()
-				}
-				v == 0 -> {
-					state = State.WAIT_SIZE
-					false
-				}
-				else   -> throw BufferUnderflowException("Frame size is negative ($v)")
+			if (v >= 0) {
+				frameSize = v
+				state = State.BODY
+				return takeBody()
 			}
+			throw BufferUnderflowException("Frame size is negative ($v)")
 		}
 	}
 	
@@ -114,9 +120,6 @@ class InputByteBufferFrameView(
 	}
 	
 	private fun commitRead(v: Int) {
-		frameSize -= v
-		if (frameSize == 0) {
-			state = State.WAIT_SIZE
-		}
+		frameReaderIndex += v
 	}
 }
