@@ -2,8 +2,9 @@ package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 import ru.capjack.tool.lang.then
+import kotlin.math.min
 
-open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer, OutputByteBuffer.ArrayView {
+class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer.ArrayView {
 	companion object {
 		inline operator fun invoke(block: ArrayByteBuffer.() -> Unit): ArrayByteBuffer {
 			return ArrayByteBuffer().apply(block)
@@ -55,7 +56,7 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 		}
 	
 	
-	fun clear() {
+	override fun clear() {
 		_readerIndex = 0
 		_writerIndex = 0
 	}
@@ -188,6 +189,15 @@ open class ArrayByteBuffer(initialCapacity: Int = 10) : InputByteBuffer, InputBy
 	
 	override fun commitWrite(size: Int) {
 		skipWrite(size)
+	}
+	
+	override fun flush() {
+		val index = min(_writerIndex, _readerIndex)
+		if (index != 0 && index != _writerIndex) {
+			_array.copyInto(_array, 0, index, _writerIndex)
+			_readerIndex = 0
+			_writerIndex -= index
+		}
 	}
 	
 	private fun checkRead(size: Int) {
