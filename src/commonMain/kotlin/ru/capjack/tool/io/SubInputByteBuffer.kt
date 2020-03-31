@@ -34,18 +34,20 @@ class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 	override val readableSize: Int
 		get() = size - _readerIndex
 	
+	
 	override val readableArrayView: InputByteBuffer.ArrayView
 		get() = this
 	
 	override val readerIndex: Int
-		get() = _readerIndex + source.readableArrayView.readerIndex
+		get() = source.readableArrayView.readerIndex
+	
+	override val array: ByteArray
+		get() = source.readableArrayView.array
 	
 	override fun commitRead(size: Int) {
 		skipRead(size)
 	}
 	
-	override val array: ByteArray
-		get() = source.readableArrayView.array
 	
 	override fun isReadable(size: Int): Boolean {
 		return readableSize >= size
