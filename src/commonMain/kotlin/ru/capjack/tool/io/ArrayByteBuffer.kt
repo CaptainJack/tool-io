@@ -1,7 +1,6 @@
 package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
-import ru.capjack.tool.lang.then
 import kotlin.math.min
 
 class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer.ArrayView {
@@ -67,21 +66,21 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 	
 	override fun readByte(): Byte {
 		checkRead(1)
-		return _array[_readerIndex].then {
+		return _array[_readerIndex].also {
 			completeRead(1)
 		}
 	}
 	
 	override fun readInt(): Int {
 		checkRead(4)
-		return _array.getInt(_readerIndex).then {
+		return _array.getInt(_readerIndex).also {
 			completeRead(4)
 		}
 	}
 	
 	override fun readLong(): Long {
 		checkRead(8)
-		return _array.getLong(_readerIndex).then {
+		return _array.getLong(_readerIndex).also {
 			completeRead(8)
 		}
 	}
