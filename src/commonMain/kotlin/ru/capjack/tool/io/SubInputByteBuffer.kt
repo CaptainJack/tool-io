@@ -1,7 +1,5 @@
 package ru.capjack.tool.io
 
-import ru.capjack.tool.lang.then
-
 class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 	private var source: InputByteBuffer = DummyInputByteBuffer
 	private var size = 0
@@ -55,21 +53,21 @@ class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 	
 	override fun readByte(): Byte {
 		checkRead(1)
-		return source.readByte().then {
+		return source.readByte().also {
 			completeRead(1)
 		}
 	}
 	
 	override fun readInt(): Int {
 		checkRead(4)
-		return source.readInt().then {
+		return source.readInt().also {
 			completeRead(4)
 		}
 	}
 	
 	override fun readLong(): Long {
 		checkRead(8)
-		return source.readLong().then {
+		return source.readLong().also {
 			completeRead(8)
 		}
 	}
