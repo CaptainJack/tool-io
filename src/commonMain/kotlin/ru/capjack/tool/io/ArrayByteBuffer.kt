@@ -85,7 +85,7 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 		}
 	}
 	
-	override fun readArray(target: ByteArray, offset: Int, size: Int) {
+	override fun readToArray(target: ByteArray, offset: Int, size: Int) {
 		if (size != 0) {
 			checkRead(size)
 			_array.copyInto(target, offset, _readerIndex, _readerIndex + size)
@@ -93,7 +93,7 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 		}
 	}
 	
-	override fun readBuffer(target: OutputByteBuffer, size: Int) {
+	override fun readToBuffer(target: OutputByteBuffer, size: Int) {
 		if (size != 0) {
 			checkRead(size)
 			target.writeArray(_array, _readerIndex, size)
@@ -148,7 +148,7 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 		val size = value.readableSize
 		if (size != 0) {
 			ensureWrite(size)
-			value.readArray(_array, _writerIndex, size)
+			value.readToArray(_array, _writerIndex, size)
 			completeWrite(size)
 		}
 	}

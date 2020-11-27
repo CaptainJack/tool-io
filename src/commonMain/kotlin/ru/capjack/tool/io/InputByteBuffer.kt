@@ -15,9 +15,9 @@ interface InputByteBuffer {
 	
 	fun readLong(): Long
 	
-	fun readArray(target: ByteArray, offset: Int = 0, size: Int = target.size - offset)
+	fun readToArray(target: ByteArray, offset: Int = 0, size: Int = target.size - offset)
 	
-	fun readBuffer(target: OutputByteBuffer, size: Int = readableSize)
+	fun readToBuffer(target: OutputByteBuffer, size: Int = readableSize)
 	
 	fun skipRead(size: Int = readableSize)
 	

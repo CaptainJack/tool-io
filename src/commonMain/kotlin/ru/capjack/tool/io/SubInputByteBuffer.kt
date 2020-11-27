@@ -16,7 +16,7 @@ class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 			_readerIndex = 0
 		}
 		else {
-			throw BufferUnderflowException(size)
+			throw BufferUnderflowException(size, source.readableSize)
 		}
 	}
 	
@@ -72,15 +72,15 @@ class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 		}
 	}
 	
-	override fun readArray(target: ByteArray, offset: Int, size: Int) {
+	override fun readToArray(target: ByteArray, offset: Int, size: Int) {
 		checkRead(size)
-		source.readArray(target, offset, size)
+		source.readToArray(target, offset, size)
 		completeRead(size)
 	}
 	
-	override fun readBuffer(target: OutputByteBuffer, size: Int) {
+	override fun readToBuffer(target: OutputByteBuffer, size: Int) {
 		checkRead(size)
-		source.readBuffer(target, size)
+		source.readToBuffer(target, size)
 		completeRead(size)
 	}
 	

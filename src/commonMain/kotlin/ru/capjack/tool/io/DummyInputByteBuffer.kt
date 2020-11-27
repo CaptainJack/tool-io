@@ -34,13 +34,13 @@ object DummyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
 		throw BufferUnderflowException(8, 0)
 	}
 	
-	override fun readArray(target: ByteArray, offset: Int, size: Int) {
+	override fun readToArray(target: ByteArray, offset: Int, size: Int) {
 		if (size != 0) {
 			throw BufferUnderflowException(size, 0)
 		}
 	}
 	
-	override fun readBuffer(target: OutputByteBuffer, size: Int) {
+	override fun readToBuffer(target: OutputByteBuffer, size: Int) {
 		if (size != 0) {
 			throw BufferUnderflowException(size, 0)
 		}

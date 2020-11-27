@@ -1,5 +1,5 @@
 package ru.capjack.tool.io
 
-fun InputByteBuffer.readToArray(size: Int = readableSize): ByteArray {
-	return ByteArray(size).also { readArray(it) }
+fun InputByteBuffer.readArray(size: Int = readableSize): ByteArray {
+	return ByteArray(size).also { readToArray(it) }
 }
