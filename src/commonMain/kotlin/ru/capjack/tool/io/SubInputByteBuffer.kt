@@ -100,10 +100,6 @@ class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 		_readerIndex -= size
 	}
 	
-	override fun flush() {
-		source.flush()
-	}
-	
 	private fun checkRead(size: Int) {
 		if (size < 0) {
 			throw BufferUnderflowException(size)
