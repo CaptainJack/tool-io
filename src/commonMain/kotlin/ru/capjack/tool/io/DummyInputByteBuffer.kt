@@ -63,7 +63,4 @@ object DummyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
 			throw BufferUnderflowException(size, 0)
 		}
 	}
-	
-	override fun flush() {
-	}
 }
