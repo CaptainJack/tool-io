@@ -23,8 +23,6 @@ interface InputByteBuffer {
 	
 	fun backRead(size: Int)
 	
-	fun flush()
-	
 	interface ArrayView {
 		val array: ByteArray
 		val readerIndex: Int

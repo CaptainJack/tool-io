@@ -60,6 +60,19 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 		_writerIndex = 0
 	}
 	
+	override fun flush() {
+		if (_readerIndex > 0) {
+			if (_readerIndex < _writerIndex) {
+				_array.copyInto(_array, 0, _readerIndex, _writerIndex)
+				_writerIndex -= _readerIndex
+				_readerIndex = 0
+			}
+			else if (_readerIndex == _writerIndex) {
+				clear()
+			}
+		}
+	}
+	
 	override fun isReadable(size: Int): Boolean {
 		return readableSize >= size
 	}
@@ -164,7 +177,7 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 		val minCapacity = _writerIndex + size
 		val oldCapacity = _array.size
 		if (minCapacity > oldCapacity) {
-			var newCapacity = oldCapacity + oldCapacity.shl(1)
+			var newCapacity = oldCapacity + oldCapacity.shr(1)
 			if (newCapacity < minCapacity) {
 				newCapacity = minCapacity
 			}
@@ -188,15 +201,6 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 	
 	override fun commitWrite(size: Int) {
 		skipWrite(size)
-	}
-	
-	override fun flush() {
-		val index = min(_writerIndex, _readerIndex)
-		if (index != 0 && index != _writerIndex) {
-			_array.copyInto(_array, 0, index, _writerIndex)
-			_readerIndex = 0
-			_writerIndex -= index
-		}
 	}
 	
 	private fun checkRead(size: Int) {
