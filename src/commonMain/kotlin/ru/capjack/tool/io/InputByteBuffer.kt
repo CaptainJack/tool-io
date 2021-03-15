@@ -5,7 +5,7 @@ interface InputByteBuffer {
 	
 	val readableSize: Int
 	
-	val readableArrayView: ArrayView
+	val arrayView: ArrayView?
 	
 	fun isReadable(size: Int): Boolean
 	
@@ -26,7 +26,5 @@ interface InputByteBuffer {
 	interface ArrayView {
 		val array: ByteArray
 		val readerIndex: Int
-		
-		fun commitRead(size: Int)
 	}
 }

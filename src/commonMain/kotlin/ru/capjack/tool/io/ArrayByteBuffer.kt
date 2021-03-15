@@ -1,9 +1,8 @@
 package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
-import kotlin.math.min
 
-class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer.ArrayView {
+class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, ByteBuffer.ArrayView {
 	companion object {
 		inline operator fun invoke(block: ArrayByteBuffer.() -> Unit): ArrayByteBuffer {
 			return ArrayByteBuffer().apply(block)
@@ -40,10 +39,7 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 	override val readableSize: Int
 		get() = _writerIndex - _readerIndex
 	
-	override val readableArrayView: InputByteBuffer.ArrayView
-		get() = this
-	
-	override val writeableArrayView: OutputByteBuffer.ArrayView
+	override val arrayView: ByteBuffer.ArrayView
 		get() = this
 	
 	override var array: ByteArray
@@ -193,14 +189,6 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, InputByteBuffer.A
 			ensureWrite(size)
 			completeWrite(size)
 		}
-	}
-	
-	override fun commitRead(size: Int) {
-		skipRead(size)
-	}
-	
-	override fun commitWrite(size: Int) {
-		skipWrite(size)
 	}
 	
 	private fun checkRead(size: Int) {

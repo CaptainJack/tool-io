@@ -2,7 +2,7 @@ package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 
-object DummyByteBuffer : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer.ArrayView {
+object DummyByteBuffer : ByteBuffer, ByteBuffer.ArrayView {
 	override val readable: Boolean
 		get() = false
 	
@@ -12,7 +12,7 @@ object DummyByteBuffer : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer
 	override val readerIndex: Int
 		get() = 0
 	
-	override val readableArrayView: InputByteBuffer.ArrayView
+	override val arrayView: ByteBuffer.ArrayView
 		get() = this
 	
 	override val array: ByteArray
@@ -20,9 +20,6 @@ object DummyByteBuffer : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer
 	
 	override val writerIndex: Int
 		get() = 0
-	
-	override val writeableArrayView: OutputByteBuffer.ArrayView
-		get() = this
 	
 	override fun clear() {
 	}
@@ -67,12 +64,6 @@ object DummyByteBuffer : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer
 		}
 	}
 	
-	override fun commitRead(size: Int) {
-		if (size != 0) {
-			throw BufferUnderflowException(size, 0)
-		}
-	}
-	
 	override fun flush() {
 	}
 	
@@ -101,10 +92,6 @@ object DummyByteBuffer : ByteBuffer, InputByteBuffer.ArrayView, OutputByteBuffer
 	}
 	
 	override fun skipWrite(size: Int) {
-		throw UnsupportedOperationException()
-	}
-	
-	override fun commitWrite(size: Int) {
 		throw UnsupportedOperationException()
 	}
 }

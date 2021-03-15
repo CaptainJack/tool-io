@@ -12,7 +12,7 @@ object DummyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
 	override val readerIndex: Int
 		get() = 0
 	
-	override val readableArrayView: InputByteBuffer.ArrayView
+	override val arrayView: InputByteBuffer.ArrayView
 		get() = this
 	
 	override val array: ByteArray
@@ -55,12 +55,6 @@ object DummyInputByteBuffer : InputByteBuffer, InputByteBuffer.ArrayView {
 	override fun backRead(size: Int) {
 		if (size != 0) {
 			throw BufferUnderflowException(size, 0, true)
-		}
-	}
-	
-	override fun commitRead(size: Int) {
-		if (size != 0) {
-			throw BufferUnderflowException(size, 0)
 		}
 	}
 }

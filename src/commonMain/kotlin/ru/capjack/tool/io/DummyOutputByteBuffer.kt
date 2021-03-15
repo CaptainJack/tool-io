@@ -6,7 +6,7 @@ object DummyOutputByteBuffer : OutputByteBuffer, OutputByteBuffer.ArrayView {
 	override val writerIndex: Int
 		get() = 0
 	
-	override val writeableArrayView: OutputByteBuffer.ArrayView
+	override val arrayView: OutputByteBuffer.ArrayView
 		get() = this
 	
 	override val array: ByteArray
@@ -37,10 +37,6 @@ object DummyOutputByteBuffer : OutputByteBuffer, OutputByteBuffer.ArrayView {
 	}
 	
 	override fun skipWrite(size: Int) {
-		throw UnsupportedOperationException()
-	}
-	
-	override fun commitWrite(size: Int) {
 		throw UnsupportedOperationException()
 	}
 }

@@ -1,6 +1,6 @@
 package ru.capjack.tool.io
 
-class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
+class SubInputByteBuffer() : InputByteBuffer {
 	private var source: InputByteBuffer = DummyInputByteBuffer
 	private var size = 0
 	private var _readerIndex = 0
@@ -33,19 +33,8 @@ class SubInputByteBuffer() : InputByteBuffer, InputByteBuffer.ArrayView {
 		get() = size - _readerIndex
 	
 	
-	override val readableArrayView: InputByteBuffer.ArrayView
-		get() = this
-	
-	override val readerIndex: Int
-		get() = source.readableArrayView.readerIndex
-	
-	override val array: ByteArray
-		get() = source.readableArrayView.array
-	
-	override fun commitRead(size: Int) {
-		skipRead(size)
-	}
-	
+	override val arrayView: InputByteBuffer.ArrayView?
+		get() = source.arrayView
 	
 	override fun isReadable(size: Int): Boolean {
 		return readableSize >= size
