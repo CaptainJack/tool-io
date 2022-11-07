@@ -1,6 +1,7 @@
 package ru.capjack.tool.io
 
 import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
+import kotlin.jvm.Volatile
 
 class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, ByteBuffer.ArrayView {
 	companion object {
@@ -21,10 +22,9 @@ class ArrayByteBuffer(initialCapacity: Int = 10) : ByteBuffer, ByteBuffer.ArrayV
 		}
 	}
 	
-	
-	private var _array = if (initialCapacity == 0) EMPTY_BYTE_ARRAY else ByteArray(initialCapacity)
-	private var _readerIndex = 0
-	private var _writerIndex = 0
+	@Volatile private var _array = if (initialCapacity == 0) EMPTY_BYTE_ARRAY else ByteArray(initialCapacity)
+	@Volatile private var _readerIndex = 0
+	@Volatile private var _writerIndex = 0
 	
 	
 	override val readerIndex: Int

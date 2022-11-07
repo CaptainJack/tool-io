@@ -1,9 +1,11 @@
 package ru.capjack.tool.io
 
+import kotlin.jvm.Volatile
+
 class SubInputByteBuffer() : InputByteBuffer {
-	private var source: InputByteBuffer = DummyInputByteBuffer
-	private var size = 0
-	private var _readerIndex = 0
+	@Volatile private var source: InputByteBuffer = DummyInputByteBuffer
+	@Volatile private var size = 0
+	@Volatile private var _readerIndex = 0
 	
 	constructor(source: InputByteBuffer, size: Int) : this() {
 		bindSource(source, size)
